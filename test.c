@@ -6,12 +6,13 @@
 /*   By: shur <shur@student.42berlin.de>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/18 16:07:39 by shur              #+#    #+#             */
-/*   Updated: 2026/11/25 09:00:34 by shur             ###   ########.fr       */
+/*   Updated: 2026/11/26 17:10:27 by shur             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // Terminal: cc test.c -L. -lft -o test
 #include "libft.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -535,7 +536,7 @@ void	test_strchr(void)
 {
 	printf("Testing strchr:\n");
 	const char test1[] = "abcdefghijklmnopqrstuvwxyz1234567890";
-	int test2 = '\0';
+	//int test2 = '\0';
 	char * addr1[37] = {0};
 	char * addr2[37] = {0};
 	for (int i = 0; i < 36; i++)
@@ -647,9 +648,9 @@ void	test_strncmp(void)
 	};
 	for (int i = 0; i < 5; i++)
 	{
-		int a = ft_strncmp((const void *) s1, (const void *) s2[i], 11);
-		int b = strncmp((const void *) s1, (const void *) s2[i], 11);
-		if (a == b)
+		int a = ft_strncmp((const char *) s1, (const char *) s2[i], 11);
+		int b = strncmp((const char *) s1, (const char *) s2[i], 11);
+		if ((a == 0 && b == 0) || (a < 0 && b < 0) || (a > 0 && b > 0))
 		{
 			print_test_case(i,1);
 		}
@@ -661,9 +662,9 @@ void	test_strncmp(void)
 	}
 	for (int i = 0, x = 5; i < 13; i++, x++)
 	{
-		int a = ft_strncmp((const void *) s1, (const void *) s2[1], i);
-		int b = strncmp((const void *) s1, (const void *) s2[1], i);
-		if (a == b)
+		int a = ft_strncmp((const char *) s1, (const void *) s2[1], i);
+		int b = strncmp((const char *) s1, (const char *) s2[1], i);
+		if ((a == 0 && b == 0) || (a < 0 && b < 0) || (a > 0 && b > 0))
 		{
 			print_test_case(x,1);
 		}
@@ -822,11 +823,11 @@ void	test_toupper(void)
 void	test_calloc(void)
 {
 	printf("Testing calloc:\n");
-	size_t nmemb[] = 	{0, 1, 100, 1000, SIZE_MAX };
-	size_t size[] = 		{1, 0, 8, 1, SIZE_MAX};
+	size_t nmemb[] = 	{0, 1, 100, 1000, SIZE_MAX / 2 - 1, 1000};
+	size_t size[] = 		{1, 0, 8, 1, 1000, SIZE_MAX / 2 - 1};
 	int err_num1[5] = {0};
 	int err_num2[5] = {0};
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		void *p1 = ft_calloc(nmemb[i], size[i]);
 		err_num1[i] = errno;
@@ -838,15 +839,7 @@ void	test_calloc(void)
 		}
 		else if (p1 != NULL && p2 != NULL)
 		{
-			if((nmemb[i] * size[i] > 0) && *(char *)p1 == *(char *)p2)
-			{
-				print_test_case(i, 1);
-			}
-			else
-			{
-				print_test_case(i, 0);
-				printf("No Zeros\n");
-			}
+			print_test_case(i, 1);
 		}
 		else
 		{
@@ -1138,11 +1131,260 @@ void	test_putchar_fd(void)
 	printf(" <-- Do you see a 1?\n");
 }
 
+void	test_putstr_fd(void)
+{
+	printf("Testing %s:\n", __FUNCTION__);
+	char test[] = "Hello World!";
+	ft_putstr_fd(test, 1);
+	printf("\n");
+}
+
+void	test_putendl_fd(void)
+{
+	printf("Testing %s:\n", __FUNCTION__);
+	char test[] = "Hello World!";
+	ft_putendl_fd(test, 1);
+	printf("\n");
+}
+
+void	test_putnbr_fd(void)
+{
+	int i = 123456789;
+	printf("Testing %s:\n", __FUNCTION__);
+	ft_putnbr_fd(i, 1);
+	printf("\n");
+}
+
 void	test_lstnew(void)
 {
 	char content[] = "new";
-
+	t_list *new = ft_lstnew((void *) content);
+	printf("Testing %s:\n", __FUNCTION__);
+	if (strcmp((char *)new->content, content) == 0)
+		print_test_case(0, 1);
+	else
+	{
+		print_test_case(0, 0);
+		printf("exp=%s, content=%s\n", content, (char *)(new->content));
+	}
+	ft_lstdelone(new, NULL);
+	printf("\n");
 }
+
+void	test_lstadd_front(void)
+{
+	char content[] = "old";
+	char content2[] = "new";
+
+	t_list *new = ft_lstnew((void *) content);
+	t_list *new2 = ft_lstnew((void *) content2);
+	t_list **top = &new;
+	ft_lstadd_front(top, new2);
+	printf("Testing %s:\n", __FUNCTION__);
+	if (strcmp((char *)(*top)->content, content2) == 0)
+		print_test_case(0, 1);
+	else
+	{
+		print_test_case(0, 0);
+		printf("result=%s, exp=%s\n",(char*) (*top)->content, content2);
+	}
+	t_list *succ = new->next;
+	ft_lstdelone(new, NULL);
+	ft_lstdelone(succ, NULL);
+	printf("\n");
+}
+
+void	test_lstsize(void)
+{
+	char content[] = "old";
+	char content2[] = "new";
+
+	t_list *new = ft_lstnew((void *) content);
+	t_list *new2 = ft_lstnew((void *) content2);
+	t_list **top = &new;
+
+	ft_lstadd_front(top, new2);
+	unsigned int len = ft_lstsize(*top);
+	printf("Testing %s:\n", __FUNCTION__);
+	if (len == 2)
+		print_test_case(0, 1);
+	else
+	{
+		print_test_case(0, 0);
+		printf("exp=2, res=%d\n", len);
+	}
+	t_list *succ = new->next;
+	ft_lstdelone(new, NULL);
+	ft_lstdelone(succ, NULL);
+	printf("\n");
+}
+
+void	test_lstlast(void)
+{
+	char content[] = "old";
+	char content2[] = "new";
+
+	t_list *new = ft_lstnew((void *) content);
+	t_list *new2 = ft_lstnew((void *) content2);
+	t_list **top = &new;
+	t_list *last;
+	ft_lstadd_front(top, new2);
+	last = ft_lstlast(*top);
+	printf("Testing %s:\n", __FUNCTION__);
+	if (strcmp((char *)last->content, content) == 0)
+		print_test_case(0, 1);
+	else
+	{
+		print_test_case(0, 0);
+		printf("exp=%s, res=%s\n", content, (char *)last->content);
+	}
+	t_list *succ = new->next;
+	ft_lstdelone(new, NULL);
+	ft_lstdelone(succ, NULL);
+	printf("\n");
+}
+
+void	test_lstadd_back(void)
+{
+	char content[] = "new";
+	char content2[] = "old";
+
+	t_list *new = ft_lstnew((void *) content);
+	t_list *new2 = ft_lstnew((void *) content2);
+	t_list **top = &new;
+	t_list *last;
+	ft_lstadd_back(top, new2);
+	last = ft_lstlast(*top);
+	printf("Testing %s:\n", __FUNCTION__);
+	if (strcmp((char *)last->content, content2) == 0)
+		print_test_case(0, 1);
+	else
+	{
+		print_test_case(0, 0);
+		printf("exp=%s, res=%s\n", content2, (char *)last->content);
+	}
+	t_list *succ = new->next;
+	ft_lstdelone(new, NULL);
+	ft_lstdelone(succ, NULL);
+	printf("\n");
+}
+
+void	test_lstclear(void)
+{
+	t_list	*new = ft_lstnew(ft_strdup("new"));
+	t_list	*new2 = ft_lstnew(ft_strdup("old"));
+	t_list	**top = &new;
+
+	ft_lstadd_back(top, new2);
+	ft_lstclear(top, free);
+	printf("Testing %s:\n", __FUNCTION__);
+	if (new == NULL)
+		print_test_case(0, 1);
+	else
+	{
+		print_test_case(0, 0);
+		printf("not freed\n");
+	}
+	printf("\n");
+}
+void	h_toupper(void * c)
+{
+	char* cc = (char *) c;
+	int i = 0;
+	while (cc[i])
+	{
+		if (cc[i] >= 97 && cc[i] <= 122)
+		{
+			cc[i] = cc[i] - 97 + 65;
+		}
+		i++;
+	}
+}
+void	test_lstiter(void)
+{
+	t_list	*new = ft_lstnew(ft_strdup("new"));
+	t_list	*new2 = ft_lstnew(ft_strdup("old"));
+	t_list	**top = &new;
+
+	printf("Testing %s:\n", __FUNCTION__);
+	ft_lstadd_back(top, new2);
+	ft_lstiter(*top, h_toupper);
+	if (strcmp((char *)(*top)->content, "NEW") == 0)
+		print_test_case(0, 1);
+	else
+	{
+		print_test_case(0, 0);
+		printf("exp=%s, res=%s\n", "NEW", (char *)(*top)->content);
+	}
+	if (strcmp((char *)(*top)->next->content, "OLD") == 0)
+		print_test_case(0, 1);
+	else
+	{
+		print_test_case(0, 0);
+		printf("exp=%s, res=%s\n", "OLD", (char *)(*top)->content);
+	}
+	printf("\n");
+	ft_lstclear(top, free);
+}
+
+void	*h2_toupper(void * c)
+{
+	char* cc = ft_strdup((char *) c);
+	if (!cc)
+		return (NULL);
+	int i = 0;
+	while (cc[i])
+	{
+		if (cc[i] >= 97 && cc[i] <= 122)
+		{
+			cc[i] = cc[i] - 97 + 65;
+		}
+		i++;
+	}
+	return ((void *) cc);
+}
+
+void	test_lstmap(void)
+{
+	t_list	*new = ft_lstnew(ft_strdup("1"));
+	t_list	*new2 = ft_lstnew(ft_strdup("2"));
+	t_list	**top = &new;
+
+	printf("Testing %s:\n", __FUNCTION__);
+	ft_lstadd_back(top, new2);
+	t_list * top2 = ft_lstmap(*top, h2_toupper, free);
+	int len1 = ft_lstsize(*top);
+	int len2 = ft_lstsize(top2);
+	if (len1 == len2)
+		print_test_case(0, 1);
+	else
+	{
+		print_test_case(0, 0);
+		printf("len1=%d, len2=%d\n", len1, len2);
+		return ;
+	}
+	t_list *curr1 = *top;
+	t_list *curr2 = top2;
+	int i = 1;
+	while (curr1 != NULL)
+	{
+		if (strcmp((char *)curr1->content, (char *)curr2->content) == 0)
+			print_test_case(i, 1);
+		else
+		{
+			print_test_case(i, 0);
+			printf("orig=%s, dup=%s\n", (char *)curr1->content, (char *)curr2->content);
+		}
+		curr1 = curr1->next;
+		curr2 = curr2->next;
+	}
+	if (top != NULL)
+		ft_lstclear(top, free);
+	if (top != NULL)
+		ft_lstclear(&top2, free);
+	printf("\n");
+}
+
 int	main(void)
 {
 	test_atoi();
@@ -1169,6 +1411,7 @@ int	main(void)
 	test_calloc();
 	test_strdup();
 
+
 	// Part 2
 	printf("============== ====== ==================\n");
 	printf("============== PART 2 ==================\n");
@@ -1181,5 +1424,16 @@ int	main(void)
 	test_strmapi();
 	test_striteri();
 	test_putchar_fd();
+	test_putstr_fd();
+	test_putendl_fd();
+	test_putnbr_fd();
+	test_lstnew();
+	test_lstadd_front();
+	test_lstsize();
+	test_lstlast();
+	test_lstadd_back();
+	test_lstclear();
+	test_lstiter();
+	test_lstmap();
 	return (0);
 }

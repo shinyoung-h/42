@@ -41,6 +41,10 @@ ft_lstadd_back.c	\
 ft_lstdelone.c		\
 ft_lstclear.c		\
 ft_lstmap.c			\
+ft_lstiter.c		\
+ft_putstr_fd.c		\
+ft_putendl_fd.c		\
+ft_putnbr_fd.c		\
 
 OBJ = $(SRC:.c=.o)
 

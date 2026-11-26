@@ -6,7 +6,7 @@
 /*   By: shur <shur@42berlin.de>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/24 18:38:18 by shur              #+#    #+#             */
-/*   Updated: 2026/11/24 18:47:15 by shur             ###   ########.fr       */
+/*   Updated: 2026/11/25 16:48:15 by shur             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ unsigned int	ft_lstsize(t_list *lst)
 
 	if (lst == NULL)
 		return (0);
-	len = 0;
+	len = 1;
 	cur = lst;
 	while (cur->next != NULL)
 	{
